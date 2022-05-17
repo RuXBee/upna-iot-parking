@@ -1,6 +1,6 @@
-from tb_device_mqtt import TBDeviceMqttClient, TBPublishInfo
+import random
+from tb_device_mqtt import TBDeviceMqttClient
 import time
-import json
 
 
 # Connection constants
@@ -33,7 +33,7 @@ payload = {"datetime": "xxxxx",
 
 
 # Instance client connection and configure it
-client = TBDeviceMqttClient("127.0.0.1", token=TOKKEN, port=1883, quality_of_service=0)
+client = TBDeviceMqttClient("172.23.176.1", token=TOKKEN, port=1883, quality_of_service=0)
 
 
 
@@ -42,19 +42,44 @@ if __name__ == "__main__":
     # Connect to ThingsBoard
     client.connect()
     
-    try:
-        # Sending telemetry without checking the delivery status
-        result = client.send_telemetry(payload)
-        print("[MQTT] Result of sending message: ", result.get())
-        time.sleep(10)  
-    except:
-        client.disconnect()
-
-
-
-# # Sending telemetry and checking the delivery status (QoS = 1 by default)
-# result = client.send_telemetry(telemetry)
-# # get is a blocking call that awaits delivery status  
-# success = result.get() == TBPublishInfo.TB_ERR_SUCCESS
-# # Disconnect from ThingsBoard
-# client.disconnect()
+    last_time_s = time.process_time()
+    print( "Possible message results:\n\
+           -----------------------------  \n\
+          | TB_ERR_AGAIN = -1           | \n\
+          | TB_ERR_SUCCESS = 0          | \n\
+          | TB_ERR_NOMEM = 1            | \n\
+          | TB_ERR_PROTOCOL = 2         | \n\
+          | TB_ERR_INVAL = 3            | \n\
+          | TB_ERR_NO_CONN = 4          | \n\
+          | TB_ERR_CONN_REFUSED = 5     | \n\
+          | TB_ERR_NOT_FOUND = 6        | \n\
+          | TB_ERR_CONN_LOST = 7        | \n\
+          | TB_ERR_TLS = 8º             | \n\
+          | TB_ERR_PAYLOAD_SIZE = 9     | \n\
+          | TB_ERR_NOT_SUPPORTED = 10   | \n\
+          | TB_ERR_AUTH = 11            | \n\
+          | TB_ERR_ACL_DENIED = 12      | \n\
+          | TB_ERR_UNKNOWN = 13         | \n\
+          | TB_ERR_ERRNO = 14           | \n\
+          | TB_ERR_QUEUE_SIZE = 15      | \n\
+           -----------------------------")
+    
+    while 1:
+        try:
+            # Sending telemetry without checking the delivery status
+            current_time_s = time.process_time()
+            
+            if time.process_time() - last_time_s > 10:
+                last_time_s = time.process_time()
+            
+                for key in payload:
+                    if type(payload[key]) == bool:
+                        payload[key] = bool(random.randint(0,1))
+            
+                result = client.send_telemetry(payload)
+                print("[MQTT] Result: ", result.get())
+        
+        except KeyboardInterrupt:
+            print("[STOP] Exit from main program...")
+            client.disconnect()
+            break
