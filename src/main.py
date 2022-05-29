@@ -1,11 +1,19 @@
 import random
-from tb_device_mqtt import TBDeviceMqttClient
 import time
+import minimalmodbus
+from tb_device_mqtt import TBDeviceMqttClient
+import serial
 
+# MQTT Thingsboard connection constants
+TOKKEN = "78bZrkitNCo5CbfpHaZy"
+ID = "e108a700-df6e-11ec-aa3d-f1baa053ab77"
+# Instance client connection and configure it
+client = TBDeviceMqttClient("127.0.0.1", token=TOKKEN, port=1883, quality_of_service=1)
 
-# Connection constants
-TOKKEN = "snz5ChFVQUv7Y6b3kfLY"
-ID = "e0ef8d40-d548-11ec-af97-53d20f5a6d2d"
+# Initialize modbus Instrument as master
+slave_id = 13
+modbus = minimalmodbus.Instrument(port="COM5", slaveaddress=slave_id, mode=minimalmodbus.MODE_RTU)
+ADDRESS_IS_THERE_PRESENCE = 2
 
 # Message
 payload = {"datetime": "xxxxx",
@@ -30,11 +38,6 @@ payload = {"datetime": "xxxxx",
            "p19": True,
            "p20": True,
            }
-
-
-# Instance client connection and configure it
-client = TBDeviceMqttClient("127.0.0.1", token=TOKKEN, port=1883, quality_of_service=0)
-
 
 
 if __name__ == "__main__":
@@ -64,21 +67,24 @@ if __name__ == "__main__":
     client.connect()
     
     last_time_s = time.process_time()
-    
+    last_value = 0
     while 1:
         try:
             # Sending telemetry without checking the delivery status
             current_time_s = time.process_time()
             
-            if time.process_time() - last_time_s > 10:
+            if time.process_time() - last_time_s > 1:
                 last_time_s = time.process_time()
-            
-                for key in payload:
-                    if type(payload[key]) == bool:
-                        payload[key] = bool(random.randint(0,1))
-            
-                result = client.send_telemetry(payload)
-                print("[MQTT] Result: ", result.get())
+                current_value = int(modbus.read_register(registeraddress=ADDRESS_IS_THERE_PRESENCE, functioncode=3))
+                if current_value != last_value:
+                    last_value = current_value
+                    for key in payload:
+                        if type(payload[key]) == bool:
+                            payload[key] = bool(random.randint(0,1))
+                    
+                    payload["p1"] = current_value
+                    result = client.send_telemetry(payload)
+                    print("[MQTT] Result: ", result.get())
         
         except KeyboardInterrupt:
             print("[STOP] Exit from main program...")
