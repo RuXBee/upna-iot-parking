@@ -1,18 +1,20 @@
+import datetime
 import random
 import time
 import minimalmodbus
 from tb_device_mqtt import TBDeviceMqttClient
-import serial
+
 
 # MQTT Thingsboard connection constants
 TOKKEN = "78bZrkitNCo5CbfpHaZy"
 ID = "e108a700-df6e-11ec-aa3d-f1baa053ab77"
 # Instance client connection and configure it
-client = TBDeviceMqttClient("127.0.0.1", token=TOKKEN, port=1883, quality_of_service=1)
+client = TBDeviceMqttClient("172.22.238.54", token=TOKKEN, port=1883, quality_of_service=1)
 
 # Initialize modbus Instrument as master
 slave_id = 13
 modbus = minimalmodbus.Instrument(port="COM5", slaveaddress=slave_id, mode=minimalmodbus.MODE_RTU)
+modbus.serial.timeout = 1                       # Prevent lost RS485 communication
 ADDRESS_IS_THERE_PRESENCE = 2
 
 # Message
@@ -75,17 +77,22 @@ if __name__ == "__main__":
             
             if time.process_time() - last_time_s > 1:
                 last_time_s = time.process_time()
-                current_value = int(modbus.read_register(registeraddress=ADDRESS_IS_THERE_PRESENCE, functioncode=3))
-                if current_value != last_value:
-                    last_value = current_value
-                    for key in payload:
-                        if type(payload[key]) == bool:
-                            payload[key] = bool(random.randint(0,1))
-                    
-                    payload["p1"] = current_value
-                    result = client.send_telemetry(payload)
-                    print("[MQTT] Result: ", result.get())
-        
+                try:
+                    current_value = int(modbus.read_register(registeraddress=ADDRESS_IS_THERE_PRESENCE, functioncode=3))
+                    print("[INFO] " +  str(datetime.datetime.now()) + "Presence in parking:\t" + str(current_value))
+                    if current_value != last_value:
+                        last_value = current_value
+                        for key in payload:
+                            if type(payload[key]) == bool:
+                                payload[key] = bool(random.randint(0,1))
+                        
+                        payload["p1"] = current_value
+                        result = client.send_telemetry(payload)
+                        print("[MQTT] Result: ", result.get())
+                except minimalmodbus.ModbusException as e:
+                    print("[MODBUS EXCEPTION] ", e)
+                except Exception as e:
+                    print("[EXCEPTION] ", e)
         except KeyboardInterrupt:
             print("[STOP] Exit from main program...")
             client.disconnect()
