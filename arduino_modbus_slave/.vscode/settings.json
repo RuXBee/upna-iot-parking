@@ -1,0 +1,45 @@
+{
+  "C_Cpp_Runner.cCompilerPath": "C:/Users/Ruben/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+  "C_Cpp_Runner.cppCompilerPath": "C:/Users/Ruben/.platformio/packages/toolchain-atmelavr/bin/g++.exe",
+  "C_Cpp_Runner.debuggerPath": "C:/Users/Ruben/.platformio/packages/toolchain-atmelavr/bin/gdb.exe",
+  "C_Cpp_Runner.cStandard": "c11",
+  "C_Cpp_Runner.cppStandard": "c++11",
+  "C_Cpp_Runner.msvcBatchPath": "",
+  "C_Cpp_Runner.useMsvc": false,
+  "C_Cpp_Runner.warnings": [
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic"
+  ],
+  "C_Cpp_Runner.enableWarnings": true,
+  "C_Cpp_Runner.warningsAsError": false,
+  "C_Cpp_Runner.compilerArgs": [],
+  "C_Cpp_Runner.linkerArgs": [],
+  "C_Cpp_Runner.includePaths": [
+    "c:/Users/Ruben/Desktop/repos/upna-iot-parking/arduino_modbus_slave/include",
+    "c:/Users/Ruben/Desktop/repos/upna-iot-parking/arduino_modbus_slave/src",
+    "c:/Users/Ruben/Desktop/repos/upna-iot-parking/arduino_modbus_slave/.pio/libdeps/uno/New_Ping/src",
+    "c:/Users/Ruben/Desktop/repos/upna-iot-parking/arduino_modbus_slave/.pio/libdeps/uno/ModbusRTUSlave/src",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/cores/arduino",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/variants/standard",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+    "C:/Users/Ruben/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+    "C:/Users/Ruben/.platformio/packages/tool-unity",
+    ""
+  ],
+  "C_Cpp_Runner.includeSearch": [
+    "*",
+    "**/*"
+  ],
+  "C_Cpp_Runner.excludeSearch": [
+    "**/build",
+    "**/build/**",
+    "**/.*",
+    "**/.*/**",
+    "**/.vscode",
+    "**/.vscode/**"
+  ]
+}
